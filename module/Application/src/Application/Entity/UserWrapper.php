@@ -311,7 +311,8 @@ class UserWrapper implements UserInterface
         switch (true) {
             case $this->userData instanceof UnicaenLdapPeople:
             case $this->userData instanceof UnicaenAppPeople:
-                return $this->userData->getSupannAliasLogin();
+                // return $this->userData->getSupannAliasLogin();
+                return $this->userData->getUid();
                 break;
             case $this->userData instanceof Utilisateur:
             case $this->userData instanceof ShibUser:

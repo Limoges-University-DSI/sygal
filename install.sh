@@ -5,7 +5,11 @@
 #
 
 # Composer install
-composer install --no-dev --no-suggest --optimize-autoloader
+# composer install --no-dev --no-suggest --optimize-autoloader
+composer install --no-suggest --optimize-autoloader
+
+# Répertoire UPLOAD
+mkdir -p upload                   && chmod -R 777 upload
 
 # Répertoires de travail de Doctrine
 mkdir -p data/cache                   && chmod -R 777 data/cache

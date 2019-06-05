@@ -66,7 +66,8 @@ class UtilisateurService extends BaseService
         $entity = new Utilisateur();
         $entity->setDisplayName($people->getNomComplet(true));
         $entity->setEmail($people->get('mail'));
-        $entity->setUsername($people->get('supannAliasLogin'));
+        // $entity->setUsername($people->get('supannAliasLogin'));
+        $entity->setUsername($people->get('uid'));
         $entity->setPassword('ldap');
         $entity->setState(1);
 
