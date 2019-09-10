@@ -14,9 +14,9 @@ use Application\Entity\Db\VersionFichier;
 use Application\Notification\ValidationRdvBuNotification;
 use Application\Service\BaseService;
 use Application\Service\Etablissement\EtablissementServiceAwareTrait;
-use Application\Service\Fichier\FichierServiceAwareTrait;
-use Application\Service\Fichier\MembreData;
-use Application\Service\Fichier\PdcData;
+use Application\Service\FichierThese\FichierTheseServiceAwareTrait;
+use Application\Service\FichierThese\MembreData;
+use Application\Service\FichierThese\PdcData;
 use Application\Service\File\FileServiceAwareTrait;
 use Application\Service\Notification\NotifierServiceAwareTrait;
 use Application\Service\UserContextServiceAwareTrait;
@@ -33,7 +33,7 @@ class TheseService extends BaseService
 {
     use ValidationServiceAwareTrait;
     use NotifierServiceAwareTrait;
-    use FichierServiceAwareTrait;
+    use FichierTheseServiceAwareTrait;
     use VariableServiceAwareTrait;
     use UserContextServiceAwareTrait;
     use EtablissementServiceAwareTrait;
@@ -190,42 +190,6 @@ class TheseService extends BaseService
     }
 
     /**
-     * Recherche le fichier de la version d'archivage de la thèse (corrigée, le cas échéant)
-     * et modifie son témoin de conformité.
-     *
-     * @param These  $these
-     * @param string $conforme "1" (conforme), "0" (non conforme) ou null (i.e. pas de réponse)
-     */
-    public function updateConformiteTheseRetraitee(These $these, $conforme = null)
-    {
-//        $fichiersVA  = $these->getFichiersByVersion(VersionFichier::CODE_ARCHI,      false);
-//        $fichiersVAC = $these->getFichiersByVersion(VersionFichier::CODE_ARCHI_CORR, false);
-        $fichiersVA  = $this->fichierService->getRepository()->fetchFichiers($these, NatureFichier::CODE_THESE_PDF , VersionFichier::CODE_ARCHI);
-        $fichiersVAC = $this->fichierService->getRepository()->fetchFichiers($these, NatureFichier::CODE_THESE_PDF , VersionFichier::CODE_ARCHI_CORR);
-
-
-        /** @var Fichier $fichier */
-        if (! empty($fichiersVAC)) {
-            $fichier = current($fichiersVAC) ?: null;
-        } else {
-            $fichier = current($fichiersVA) ?: null;
-        }
-
-        // il n'existe pas forcément de fichier en version d'archivage (si la version originale est testée archivable)
-        if ($fichier === null) {
-            return;
-        }
-
-        $fichier->setEstConforme($conforme);
-
-        try {
-            $this->entityManager->flush($fichier);
-        } catch (OptimisticLockException $e) {
-            throw new RuntimeException("Erreur rencontrée lors de l'enregistrement", null, $e);
-        }
-    }
-
-    /**
      * @param These $these
      * @param RdvBu $rdvBu
      */
@@ -290,8 +254,15 @@ class TheseService extends BaseService
             if ($these->getLibellePaysCotutelle()) $pdcData->setCotutuellePays($these->getLibellePaysCotutelle());
         }
 
+
+
         /** Jury de thèses */
         $acteurs = $these->getActeurs()->toArray();
+
+        $jury = array_filter($acteurs, function (Acteur $a) {
+           return $a->estMembreDuJury();
+        });
+
         $rapporteurs = array_filter($acteurs, function (Acteur $a) {
             return $a->estRapporteur();
         });
@@ -337,6 +308,12 @@ class TheseService extends BaseService
 
             if (!$acteur->estPresidentJury()) {
                 $acteurData->setRole($acteur->getRole()->getLibelle());
+
+                //patch rapporteur non membre ...
+                $estMembre = !empty(array_filter($jury, function (Acteur $a) use ($acteur) {return $a->getIndividu() === $acteur->getIndividu();}));
+                if ($acteur->getRole()->getCode() === Role::CODE_RAPPORTEUR_JURY && !$estMembre) {
+                    $acteurData->setRole("Rapporteur non membre du jury");
+                }
             } else {
                 $acteurData->setRole(Role::LIBELLE_PRESIDENT);
             }

@@ -99,6 +99,8 @@ class These implements HistoriqueAwareInterface, ResourceInterface
     private $datePremiereInscription;
 
     /**
+     * NB: N'est plus mappée à une colonne.
+     *
      * @var integer
      */
     private $anneeUniv1ereInscription;
@@ -176,7 +178,7 @@ class These implements HistoriqueAwareInterface, ResourceInterface
     /**
      * @var Collection
      */
-    private $fichiers;
+    private $fichierTheses;
 
     /**
      * @var Collection
@@ -234,6 +236,11 @@ class These implements HistoriqueAwareInterface, ResourceInterface
     private $anneesUnivInscription;
 
     /**
+     * @var ArrayCollection
+     */
+    private $anneesUniv1ereInscription;
+
+    /**
      * @return TitreApogeeFilter
      */
     public function getTitreFilter()
@@ -249,13 +256,14 @@ class These implements HistoriqueAwareInterface, ResourceInterface
      */
     public function __construct()
     {
-        $this->fichiers = new ArrayCollection();
+        $this->fichierTheses = new ArrayCollection();
         $this->metadonnees = new ArrayCollection();
         $this->attestations = new ArrayCollection();
         $this->miseEnLignes = new ArrayCollection();
         $this->acteurs = new ArrayCollection();
         $this->rdvBus = new ArrayCollection();
         $this->anneesUnivInscription = new ArrayCollection();
+        $this->anneesUniv1ereInscription = new ArrayCollection();
     }
 
     /**
@@ -686,12 +694,24 @@ class These implements HistoriqueAwareInterface, ResourceInterface
     }
     
     /**
-     * @param Fichier $fichier
+     * @param FichierThese $fichierThese
      * @return $this
      */
-    public function addFichier(Fichier $fichier)
+    public function addFichierThese(FichierThese $fichierThese)
     {
-        $this->fichiers->add($fichier);
+        $this->fichierTheses->add($fichierThese);
+
+        return $this;
+    }
+
+    /**
+     * @param FichierThese $fichierThese
+     * @return $this
+     */
+    public function removeFichierThese(FichierThese $fichierThese)
+    {
+        $this->fichierTheses->removeElement($fichierThese);
+
         return $this;
     }
 
@@ -701,7 +721,15 @@ class These implements HistoriqueAwareInterface, ResourceInterface
      */
     public function removeFichier(Fichier $fichier)
     {
-        $this->fichiers->removeElement($fichier);
+        $fichierThese = $this->fichierTheses->filter(function(FichierThese $ft) use ($fichier) {
+            return $ft->getFichier() === $fichier;
+        })->first();
+        if (! $fichierThese) {
+            throw new RuntimeException("Le fichier à supprimer est introuvable parmi les fichiers de la thèse");
+        }
+
+        $this->fichierTheses->removeElement($fichierThese);
+
         return $this;
     }
 
@@ -1111,33 +1139,6 @@ class These implements HistoriqueAwareInterface, ResourceInterface
     }
 
     /**
-     * @return int
-     */
-    public function getAnneeUniv1ereInscription()
-    {
-        return $this->anneeUniv1ereInscription;
-    }
-
-    /**
-     * @return int
-     */
-    public function getAnneeUniv1ereInscriptionToString()
-    {
-        return $this->anneeUniv1ereInscription . '/' . ($this->anneeUniv1ereInscription + 1);
-    }
-
-    /**
-     * @param int $anneeUniv1ereInscription
-     * @return These
-     */
-    public function setAnneeUniv1ereInscription($anneeUniv1ereInscription)
-    {
-        $this->anneeUniv1ereInscription = (int) $anneeUniv1ereInscription;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getLibelleEtabCotutelle()
@@ -1208,8 +1209,19 @@ class These implements HistoriqueAwareInterface, ResourceInterface
     public function getAnneesUnivInscriptionToString($glue = ', ')
     {
         return implode($glue, array_map(function(TheseAnneeUniv $tau) {
-            return $tau->getAnneeUniv1ereInscriptionToString();
+            return $tau->getAnneeUnivToString();
         }, $this->anneesUnivInscription->toArray()));
+    }
+
+    /**
+     * Retourne l'année universitaire de première inscription,
+     *
+     * @return TheseAnneeUniv|VTheseAnneeUnivFirst
+     */
+    public function getAnneeUniv1ereInscription()
+    {
+        // NB: le mapping de VTheseAnneeUnivFirst est un copier-coller de TheseAnneeUniv
+        return $this->anneesUniv1ereInscription->first();
     }
 
     /**
@@ -1407,34 +1419,40 @@ class These implements HistoriqueAwareInterface, ResourceInterface
 
     public function hasAnnexe()
     {
-        /** @var Fichier $fichier */
-        foreach ($this->fichiers as $fichier) {
-            if ($fichier->getNature() === NatureFichier::CODE_FICHIER_NON_PDF) return true;
+        /** @var FichierThese $fichier */
+        foreach ($this->fichierTheses as $fichier) {
+            if ($fichier->getFichier()->getNature() === NatureFichier::CODE_FICHIER_NON_PDF) return true;
         }
         return false;
     }
 
     public function hasMemoire()
     {
-        /** @var Fichier $fichier */
-        foreach ($this->fichiers as $fichier) {
-            if ($fichier->getNature() === NatureFichier::CODE_THESE_PDF) return true;
+        /** @var FichierThese $fichier */
+        foreach ($this->fichierTheses as $fichier) {
+            if ($fichier->getFichier()->getNature() === NatureFichier::CODE_THESE_PDF) return true;
         }
         return false;
     }
 
     public function hasVersionInitiale() {
-        /** @var Fichier $fichier */
-        foreach ($this->fichiers as $fichier) {
-            if ($fichier->getHistoDestruction() === null && $fichier->getNature() === NatureFichier::CODE_THESE_PDF && $fichier->getVersion() === VersionFichier::CODE_ORIG) return $fichier;
+        /** @var FichierThese $fichier */
+        foreach ($this->fichierTheses as $fichier) {
+            if ($fichier->getFichier()->getHistoDestruction() === null
+                && $fichier->getFichier()->getNature() === NatureFichier::CODE_THESE_PDF
+                && $fichier->getFichier()->getVersion() === VersionFichier::CODE_ORIG)
+                    return $fichier;
         }
         return null;
     }
 
     public function hasVersionCorrigee() {
-        /** @var Fichier $fichier */
-        foreach ($this->fichiers as $fichier) {
-            if ($fichier->getHistoDestruction() === null && $fichier->getNature() === NatureFichier::CODE_THESE_PDF && $fichier->getVersion() === VersionFichier::CODE_ORIG_CORR) return $fichier;
+        /** @var FichierThese $fichier */
+        foreach ($this->fichierTheses as $fichier) {
+            if ($fichier->getFichier()->getHistoDestruction() === null
+                && $fichier->getFichier()->getNature() === NatureFichier::CODE_THESE_PDF
+                && $fichier->getFichier()->getVersion() === VersionFichier::CODE_ORIG_CORR)
+                    return $fichier;
         }
         return null;
     }

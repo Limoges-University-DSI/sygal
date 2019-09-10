@@ -343,7 +343,9 @@ class StructureService extends BaseService
     public function getStructuresSubstituantes($type = null, $order = null)
     {
         $qb = $this->getEntityManager()->getRepository(Structure::class)->createQueryBuilder("s")
-            ->andWhere("s.structuresSubstituees IS NOT EMPTY");
+            ->addSelect('substituees')
+            ->join("s.structuresSubstituees", "substituees")/*
+            ->andWhere("s.structuresSubstituees IS NOT EMPTY")*/;
         if ($type) {
             $typeStructure = $this->fetchTypeStructure($type);
             $qb->andWhere("s.typeStructure = :type")
@@ -442,6 +444,10 @@ class StructureService extends BaseService
     }
 
 
+    /**
+     * @param $structure
+     * @param $data
+     */
     public function updateFromPostData($structure, $data)
     {
         $hydrator = new DoctrineObject($this->getEntityManager());
@@ -667,6 +673,30 @@ class StructureService extends BaseService
             ->addSelect('structure')
             ->join('structureConcrete.structure', 'structure')
             ->andWhere('structure.id = :structureId')
+            ->setParameter('structureId', $structureId)
+        ;
+
+        try {
+            $result = $qb->getQuery()->getOneOrNullResult();
+        } catch (NonUniqueResultException $e) {
+            throw new RuntimeException("Plusieurs ".$type." partagent le même identifiant de structure [".$structureId."]");
+        }
+
+        if (!$result) throw new RuntimeException("Aucun(e) ".$type." de trouvé(e).");
+        return $result;
+    }
+
+    /**
+     * @param string $type
+     * @param int $structureId
+     * @return StructureConcreteInterface
+     */
+    public function getStructuresConcreteByTypeAndStructureConcreteId($type, $structureId)
+    {
+        $qb = $this->getEntityManager()->getRepository($this->getEntityByType($type))->createQueryBuilder('structureConcrete')
+            ->addSelect('structure')
+            ->join('structureConcrete.structure', 'structure')
+            ->andWhere('structureConcrete.id = :structureId')
             ->setParameter('structureId', $structureId)
         ;
 
