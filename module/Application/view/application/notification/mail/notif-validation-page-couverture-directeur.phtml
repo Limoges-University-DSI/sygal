@@ -1,0 +1,41 @@
+<?php
+
+use Application\Entity\Db\These;
+use Application\Notification\ValidationPageDeCouvertureNotification;
+use Application\View\Renderer\PhpRenderer;
+
+/**
+ * @var PhpRenderer $this
+ * @var These       $these
+ * @var bool        $isValidation
+ *
+ * @see ValidationPageDeCouvertureNotification
+ */
+
+$appli = $this->appInfos()->nom;
+?>
+
+<p>
+    <em>Ceci est un mail envoyé automatiquement par l'application <?php echo $appli ?>.</em>
+</p>
+
+<?php if ($isValidation): ?>
+<p>
+    Le jury de soutenance de thèse de <?php echo $these->getDoctorant(); ?> a été validé. 
+<p>
+    Lorsque <?php echo $these->getDoctorant(); ?> aura procédé au dépôt de son manuscrit, une nouvelle notification vous sera alors envoyée pour vous indiquer les démarches que vous aurez à effectuer  (validation du manuscrit, analyse anti-plagiat, etc…). 
+</p>
+<?php else: ?>
+<p>
+    Vous êtes informé·e que l'application <?php echo $appli ?> n'est plus en mesure de produire la page
+    de couverture de la thèse de <?php echo $these->getDoctorant(); ?> automatiquement à partir des informations de scolarité.
+</p>
+<p>
+    <?php echo $these->getDoctorant(); ?> a été notifié du problème.
+</p>
+<?php endif ?>
+
+<p>
+    <a href="<?php echo $this->url('home', [], ['force_canonical' => true]) ?>"
+    >Accéder à l'application <?php echo $appli ?></a>.
+</p>

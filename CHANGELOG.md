@@ -1,6 +1,99 @@
 Journal des modifications
 =========================
 
+1.3.1 (25/11/2019)
+------------------
+
+### Corrections
+
+- Correction d'un bug empêchant la suppression auto de fichier lorsqu'on dépose une version retraitée manuellement.
+
+1.3.0 (22/11/2019)
+------------------
+
+### Ajouts
+
+- Convention de mise en ligne : 
+    - Le libellé du tribunal compétent mentionné est importé de chaque établissement.
+    - Utilisation de la mention générique "Le chef d'établissement" plutôt que d'exploiter les libellés 
+      importés des établissements.
+- Nouvelle ligne de commande pour importer une thèse à la demande.
+
+### Corrections
+
+- Import : 
+    - Vidage et remplissage de chaque table temporaire n'étaient pas faits dans une même transaction !
+    - Améliorations pour utiliser moins de mémoire ; meilleurs logs. 
+    - Correction des exceptions de type `ORA-00001: unique constraint (SYGAL.TMP_ACTEUR_UNIQ) violated` 
+      par un changement de stratégie côté web service (interrogation de tables plutôt que des vues). 
+- Le bouton d'import d'une thèse à la demande avait disparu (menu "Page de couverture") à cause d'une config erronée.
+
+1.2.11 (13/11/2019)
+------------------
+
+### Correction
+
+- Changement dans l'export pour récupérer les dates et la liste de fichiers (qui avait été oubliés précédemment) pour les infos
+    - Date de dépôt version initiale
+    - Date de dépôt version corrigée
+    - Thèse format PDF
+    - Annexes
+    
+1.2.10 (5/11/2019)
+------------------
+
+### Ajout
+
+- Un message avertissant des formats d'image valide est maintenant ajouté dans les pages de modification des structures concertes
+- Utilisation de convert (imagemagick) pour convertir les logos "automatiquement" au format png 
+
+1.2.9 (24/10/2019)
+------------------
+
+### Correction
+
+- Correction de l'assertion gérant la saisie de conformité de la version corrigée achivable.
+
+1.2.8 (21/10/2019)
+------------------
+
+### Correction
+
+- Déplacement de l'INE dans les données Doctorant.
+
+1.2.7 (17/10/2019)
+------------------
+
+### Ajout
+
+- L'export des thèses contient maintenant deux colonnes supplémentaires : adresse électronnique de contact et INE
+    - l'adresse électronique de contact est récupérée de la saisie faite à la première connection à SyGAL
+    - l'INE sera rappatrié via les Web Services
+
+1.2.6 (15/10/2019)
+------------------
+
+### Corrections
+
+- L'envoi de mail concernant les résultats de thèses modifiés échouait à cause d'une erreur dans le chemin de la vue.
+
+
+1.2.5 (04/10/2019)
+------------------
+
+### Améliorations
+
+- Ligne de commande d'import : nouvel argument --verbose pour obtenir plus de logs.
+
+
+1.2.4 (27/09/2019)
+------------------
+
+### Corrections
+
+- Persistance du logo si non renseigné et changement de la redirection et des flashMessenger.
+
+
 1.2.3 (29/08/2019)
 ------------------
 
