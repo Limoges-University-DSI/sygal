@@ -1,0 +1,39 @@
+<?php
+/**
+ * @var These $these
+ */
+
+use Application\Entity\Db\These;
+use UnicaenApp\Util;
+
+$these = $acteur->getThese();
+
+?>
+
+<div class="panel panel-info these-panel">
+    <?php if ($this->header): ?>
+    <div class="panel-heading">
+        <?php echo $this->header ?>
+    </div>
+    <?php endif ?>
+    <div class="panel-body">
+        <h4><?php echo $these->getTitre() ?></h4>
+        <p>
+            <span><strong>Rôle : </strong><?php echo $acteur->getRole()->getLibelle(); ?></span><br/>
+            <span><strong>Doctorant : </strong><?php echo $these->getDoctorant()->getNomComplet(); ?></span><br/>
+            <span><strong>État : </strong><?php echo $these->getEtatTheseToString(); ?></span> 
+            <?php 
+            $dateSoutenance = $these->getDateSoutenance() ? $these->getDateSoutenance() : $these->getDatePrevisionSoutenance();
+            if( $dateSoutenance ) { ?>
+            | <span><strong>Date de soutenance : </strong><?php echo Util::formattedDate( $dateSoutenance ); ?></span>
+            | <span><strong>Date limite de dépôt : </strong><?php echo Util::formattedDate( $dateSoutenance->sub( new DateInterval('P1M') ) ); ?></span>
+            <?php } ?>
+        </p>
+        <ul class="roadmap pagination">
+            <li>
+                <?php $url = $this->url('these/identite', ['these' => $these->getId()]) ?>
+                <a class="roadmap-step-link " href="<?php echo $url ?>"><span class="glyphicon glyphicon-circle-arrow-right"></span>Détails...</a>
+            </li>
+        </ul>
+    </div>
+</div>
