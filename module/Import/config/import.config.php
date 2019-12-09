@@ -3,6 +3,7 @@
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\DBAL\Driver\OCI8\Driver as OCI8;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
+use Import\Controller\ImportController;
 use Import\Service\CallService;
 use Zend\Mvc\Router\Console\Simple;
 use Zend\Mvc\Router\Http\Literal;
@@ -67,8 +68,11 @@ return [
                 'import-console' => [
                     'type' => Simple::class,
                     'options' => [
-                        'route'    => 'import --service=  --etablissement= [--source-code=] [--synchronize=] [--em=]',
+                        'route'    => 'import --service=  --etablissement= [--source-code=] [--synchronize=] [--verbose] [--em=]',
                         'defaults' => [
+                            /**
+                             * @see ImportController::importConsoleAction()
+                             */
                             'controller' => Import\Controller\ImportController::class,
                             'action'     => 'import-console',
                         ],
@@ -77,10 +81,26 @@ return [
                 'import-all-console' => [
                     'type' => Simple::class,
                     'options' => [
-                        'route'    => 'import-all --etablissement= [--breakOnServiceNotFound=] [--synchronize=] [--em=]',
+                        'route'    => 'import-all --etablissement= [--breakOnServiceNotFound=] [--synchronize=] [--verbose] [--em=]',
                         'defaults' => [
+                            /**
+                             * @see ImportController::importAllConsoleAction()
+                             */
                             'controller' => Import\Controller\ImportController::class,
                             'action'     => 'import-all-console',
+                        ],
+                    ],
+                ],
+                'update-these-console' => [
+                    'type' => Simple::class,
+                    'options' => [
+                        'route'    => 'update-these --id= [--verbose] [--em=]',
+                        'defaults' => [
+                            /**
+                             * @see ImportController::updateTheseConsoleAction()
+                             */
+                            'controller' => Import\Controller\ImportController::class,
+                            'action'     => 'update-these-console',
                         ],
                     ],
                 ],

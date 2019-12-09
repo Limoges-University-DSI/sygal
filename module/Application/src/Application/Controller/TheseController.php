@@ -1242,9 +1242,9 @@ class TheseController extends AbstractController
 
                 // suppression des fichiers expurgés éventuellement déposés en l'absence de pb de droit d'auteur
                 $besoinVersionExpurgee = ! $diffusion->getDroitAuteurOk();
-                $fichiersExpurgesDeposes = $this->fichierTheseService->getRepository()->fetchFichierTheses($these, null , $version, false);
-                if (! $besoinVersionExpurgee && !empty($fichiersExpurgesDeposes)) {
-                    $this->fichierTheseService->deleteFichiers($fichiersExpurgesDeposes, $these);
+                $fichierThesesExpurgesDeposes = $this->fichierTheseService->getRepository()->fetchFichierTheses($these, null , $version, false);
+                if (! $besoinVersionExpurgee && !empty($fichierThesesExpurgesDeposes)) {
+                    $this->fichierTheseService->deleteFichiers($fichierThesesExpurgesDeposes, $these);
 //                    $this->flashMessenger()->addSuccessMessage("Les fichiers expurgés fournis devenus inutiles ont été supprimés.");
                 }
 
@@ -1310,8 +1310,7 @@ class TheseController extends AbstractController
         $codes = [
             Variable::CODE_ETB_LIB,
             Variable::CODE_ETB_ART_ETB_LIB,
-            Variable::CODE_ETB_LIB_TIT_RESP,
-            Variable::CODE_ETB_LIB_NOM_RESP,
+            Variable::CODE_TRIBUNAL_COMPETENT,
         ];
         $dateObs = $these->getDateSoutenance() ?: $these->getDatePrevisionSoutenance();
         $variableRepo = $this->variableService->getRepository();
@@ -1321,8 +1320,7 @@ class TheseController extends AbstractController
         $libEtablissementA = "à " . $letab;
         $libEtablissementLe = $letab;
         $libEtablissementDe = "de " . $letab;
-        $libPresidentLe = $vars[Variable::CODE_ETB_LIB_TIT_RESP]->getValeur();
-        $nomPresid = $vars[Variable::CODE_ETB_LIB_NOM_RESP]->getValeur();
+        $libTribunal = lcfirst($vars[Variable::CODE_TRIBUNAL_COMPETENT]->getValeur());
 
         $renderer = $this->getServiceLocator()->get('view_renderer'); /* @var $renderer \Zend\View\Renderer\PhpRenderer */
         $exporter = new ConventionPdfExporter($renderer, 'A4');
@@ -1333,8 +1331,7 @@ class TheseController extends AbstractController
             'libEtablissementA'  => $libEtablissementA,
             'libEtablissementLe' => $libEtablissementLe,
             'libEtablissementDe' => $libEtablissementDe,
-            'libPresidentLe'     => $libPresidentLe,
-            'nomPresid'          => $nomPresid,
+            'libTribunal'        => $libTribunal,
         ]);
         $exporter->export('export.pdf');
         exit;
