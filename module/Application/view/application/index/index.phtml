@@ -44,14 +44,14 @@ echo $this->messenger()
 
         <?php if (!$this->identity()): ?>
             <?php echo $appName ?> (<?php echo $subtitle ?>) est une application permettant la gestion dématérialisée
-            de l’ensemble des étapes du parcours doctoral en Normandie. Il offre également aux différents acteurs du parcours
+            de l’ensemble des étapes du parcours doctoral. Il offre également aux différents acteurs du parcours
             doctoral (établissements, écoles doctorales) une visibilité sur les thèses en cours ou passées.
         <?php endif ?>
 
         <?php if (!$this->identity()): ?>
             <p class="text-danger">
                 <strong>
-                    <?php echo $this->translate("Vous n'êtes pas connecté-e."); ?>
+                    <?php echo $this->translate("Vous n'êtes pas connecté·e."); ?>
                 </strong>
             </p>
             <p>
@@ -63,7 +63,7 @@ echo $this->messenger()
             <?php if (!$estDoctorant): ?>
                 <p class="text-success">
                     <strong>
-                        <?php echo $this->translate("Vous êtes connecté-e en tant que"); ?>
+                        <?php echo $this->translate("Vous êtes connecté·e en tant que"); ?>
                         &laquo; <?php echo ($role)?:"utilisateur authentifié"; ?> &raquo;.
                     </strong>
                 </p>
@@ -84,3 +84,5 @@ echo $this->messenger()
     </div>
 
 </div>
+
+<?php //var_dump( $this->identity() ); ?>

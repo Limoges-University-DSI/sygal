@@ -117,6 +117,7 @@ class DoctorantController extends AbstractController
         }
 
         $result = $authAdapter->getLdapAuthAdapter()->getLdap()->searchEntries("(supannAliasLogin=$identity)");
+        //$result = $authAdapter->getLdapAuthAdapter()->getLdap()->searchEntries("(uid=$identity)");
         $entry = current($result);
 
         $mail = null;

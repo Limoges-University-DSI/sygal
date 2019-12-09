@@ -8,6 +8,10 @@ use Application\Entity\Db\These;
 $appName = $this->appInfos()->nom;
 ?>
 
+<?php foreach ($acteurs as $acteur): ?>
+    <?php echo $this->partial('application/these/partial/panel-dir', ['acteur' => $acteur]) ?>
+<?php endforeach ?>
+
 <p>
     <?php echo $appName ?> vous offre une vue sur les thèses que vous dirigez au sein de votre établissement.
     Les informations sont importées d’Apogée dès l’inscription en première année de doctorat puis mises à jour en temps réel.

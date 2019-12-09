@@ -21,7 +21,7 @@ if (!$passed){
 }
 /* Fin de fermeture du service */
 
-
+ opcache_reset();
 
 define('REQUEST_MICROTIME', microtime(true));
 

@@ -5,7 +5,7 @@ namespace Application\Controller;
 use Application\Entity\Db\Role;
 use Application\Entity\Db\TypeValidation;
 use Application\Notification\ValidationDepotTheseCorrigeeNotification;
-use Application\Notification\ValidationPageDeCouvertureNotification;
+// use Application\Notification\ValidationPageDeCouvertureNotification;
 use Application\Notification\ValidationRdvBuNotification;
 use Application\Provider\Privilege\ValidationPrivileges;
 use Application\Service\Notification\NotifierServiceAwareTrait;
@@ -16,6 +16,9 @@ use Application\Service\Variable\VariableServiceAwareTrait;
 use Notification\Notification;
 use UnicaenApp\Exception\RuntimeException;
 use Zend\View\Model\ViewModel;
+
+use Application\Notification\ValidationPageDeCouvertureNotificationDirecteur;
+use Application\Notification\ValidationPageDeCouvertureNotificationDoctorant;
 
 class ValidationController extends AbstractController
 
@@ -34,23 +37,41 @@ class ValidationController extends AbstractController
 
         // si un tableau est retourné par le plugin, l'opération a été confirmée
         if (is_array($result)) {
-            $notification = new ValidationPageDeCouvertureNotification();
-            $notification->setThese($these);
-            $notification->setAction($action);
+            // ORIGINE
+            // $notification = new ValidationPageDeCouvertureNotification();
+            // $notification->setThese($these);
+            // $notification->setAction($action);
+
+            // if ($action === 'valider') {
+            //     $this->validationService->validatePageDeCouverture($these);
+            //     $successMessage = "Validation de la page de couverture enregistrée avec succès.";
+
+            //     // notification
+            //     $this->notifierService->trigger($notification);
+            // }
+            // MODIFIÉ
+            $notificationDoctorant = new ValidationPageDeCouvertureNotificationDoctorant();
+            $notificationDoctorant->setThese($these);
+            $notificationDoctorant->setAction($action);
+
+            $notificationDirecteur = new ValidationPageDeCouvertureNotificationDirecteur();
+            $notificationDirecteur->setThese($these);
+            $notificationDirecteur->setAction($action);
 
             if ($action === 'valider') {
                 $this->validationService->validatePageDeCouverture($these);
                 $successMessage = "Validation de la page de couverture enregistrée avec succès.";
 
                 // notification
-                $this->notifierService->trigger($notification);
+                $this->notifierService->trigger($notificationDoctorant);
+                $this->notifierService->trigger($notificationDirecteur);
             }
             elseif ($action === 'devalider') {
                 $this->validationService->unvalidatePageDeCouverture($these);
                 $successMessage ="Validation de la page de couverture annulée avec succès.";
 
                 // notification
-//                $this->notifierService->trigger($notification);
+                // $this->notifierService->trigger($notification);
             }
             else {
                 throw new RuntimeException("Action inattendue!");

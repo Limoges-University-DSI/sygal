@@ -19,6 +19,8 @@ use UnicaenAuth\Entity\Shibboleth\ShibUser;
 use UnicaenAuth\Service\UserContext as BaseUserContextService;
 use Zend\Permissions\Acl\Role\RoleInterface;
 
+use Zend\Log\Logger;
+
 class UserContextService extends BaseUserContextService
 {
     use IndividuServiceAwareTrait;

@@ -30,7 +30,7 @@ if (php_sapi_name() === 'cli') {
 $devModules =  [
     'ZendDeveloperTools',
     'UnicaenCode',
-    'UnicaenTest',
+    //'UnicaenTest',
 ];
 
 if ('development' === $env) {

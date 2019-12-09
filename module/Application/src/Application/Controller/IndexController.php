@@ -12,6 +12,9 @@ use Zend\Http\Response;
 use Zend\Validator\EmailAddress as EmailAddressValidator;
 use Zend\View\Model\ViewModel;
 
+use Application\Entity\Db\Acteur;
+use Doctrine\ORM\Query\Expr\Join;
+
 class IndexController extends AbstractController
 {
     use VariableServiceAwareTrait;
@@ -130,6 +133,18 @@ EOS
          * Profil "Directeur de thèse".
          */
         elseif ($role = $this->userContextService->getSelectedRoleDirecteurThese()) {
+            // THESES en tant que directeur
+            //$repo = $this->acteurService->getRepository();
+            
+            $acteurService = $this->getServiceLocator()->get('Application\Service\Acteur\ActeurService');
+            $userWrapper = $this->userContextService->getIdentityUserWrapper();
+            $list = $acteurService->getRepository()->createQueryBuilder('a')
+                ->join('a.individu', 'i', Join::WITH, 'i.id = :id')
+                ->setParameter( 'id', $userWrapper->getIndividu()->getId() );
+            
+            $vm->setVariables([
+                'acteurs' => $list->getQuery()->getResult()
+            ]);
             $vm->setTemplate('application/index/partial/dir-these');
         }
         /**

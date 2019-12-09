@@ -18,6 +18,12 @@ return [
 
         'enable_privileges' => true,
 
+        /**
+         * Attribut LDAP utilisé pour le username des utilisateurs
+         * A personnaliser au besoin
+         */
+        'ldap_username' => 'uid',
+
         // Nom du gestionnaire d'entités à utiliser
         'entity_manager_name' => 'doctrine.entitymanager.orm_default',
 

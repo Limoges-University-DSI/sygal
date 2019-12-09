@@ -324,6 +324,7 @@ class UserWrapper implements UserInterface
             case $this->userData instanceof UnicaenLdapPeople:
             case $this->userData instanceof UnicaenAppPeople:
                 return $this->userData->getSupannAliasLogin();
+                //return $this->userData->getUid();
 
             case $this->userData instanceof Utilisateur:
             case $this->userData instanceof ShibUser:

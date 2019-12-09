@@ -23,7 +23,7 @@ class ResultatTheseModifieNotification extends Notification
         $this->setTemplateVariables([
             'these' => $this->these,
             'data' => $this->data,
-            'message' => "Vous êtes informé-e que des modifications de résultats de thèses ont été détectées lors de la synchro avec Apogée.",
+            'message' => "Vous êtes informé·e que des modifications de résultats de thèses ont été détectées lors de la synchro avec Apogée.",
         ]);
 
         return $this;

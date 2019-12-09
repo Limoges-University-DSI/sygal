@@ -613,11 +613,11 @@ msgid ""
 msgstr ""
 
 #: module/Application/view/application/index/index.phtml:40
-msgid "Vous n'êtes pas connecté-e."
+msgid "Vous n'êtes pas connecté·e."
 msgstr ""
 
 #: module/Application/view/application/index/index.phtml:52
-msgid "Vous êtes connecté-e en tant que"
+msgid "Vous êtes connecté·e en tant que"
 msgstr ""
 
 #: module/Application/view/application/index/index.phtml:60
